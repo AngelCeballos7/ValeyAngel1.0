@@ -1,0 +1,23 @@
+body {
+  margin: 0;
+  overflow: hidden;
+  background-color: black;
+  font-family: 'Arial', sans-serif;
+  user-select: none;
+}
+
+#main-text {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  top: 30%;
+  font-size: 3em;
+  color: #ff69b4;
+  z-index: 2;
+}
+
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
