@@ -58,28 +58,80 @@
 
   <img id="cursor" class="heart-cursor" alt="heart" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjZmY2OWI0IiBkPSJNNDcuNiAyNUMyNS4xIDI1IDcgNDMuMSA3IDY1LjZDNyA4OC4xIDI0LjMgMTI3IDkzLjUgMTU3LjVjNjkuMiAzMC41IDE0Ni4zIDY0LjEgMTYxLjUgODQuMSAxNS4yLTIwIDEwMC4xLTUzLjYgMTY5LjMtODQuMSA2OS4yLTMwLjUgODYuNS02OS40IDg2LjUtOTEuOSAwLTIyLjUtMTguMS00MC42LTQwLjYtNDAuNnMtNDAuNiAxOC4xLTQwLjYgNDAuNmMwIDguMSAxLjYgMTUuNSA0LjMgMjIuMi0zLjEgMi4yLTYuNyAzLjUtMTAuNyAzLjUtMTMuOCAwLTI1LTExLjItMjUtMjVzMTEuMi0yNSAyNS0yNWM4LjEgMCAxNS41IDMuOSAyMC4yIDEwLjIgMTEuNy0xNS4yIDE4LjgtMzQuMiAxOC44LTU1LjIgMC00NS45LTM3LjItODMuMS04My4xLTgzLjFzLTgzLjEgMzcuMi04My4xIDgzLjFjMCAxNi4zIDQuNyAzMS41IDEyLjggNDQuMy0xLjIgMS4xLTIuNiAyLjEtNC4xIDIuOS0xNC4zIDcuOC0yNiggMTQuOS0zNi4yIDIwLjJDMTA5LjMgMTIxLjUgNDcuNiA4OC4xIDQ3LjYgNjUuNnMxOC4xLTQwLjYgNDAuNi00MC42QzEwOS4zIDI1IDc3IDQzLjEgNzcgNjUuNnMzMi4zIDQwLjYgMzIuMyA0MC42UzE3MC4xIDI1IDQ3LjYgMjV6Ii8+PC9zdmc+" />
 
-  <audio id="audio-control" loop>
+  <audio id="audio-control" loop preload="auto" playsinline x-webkit-airplay="allow" crossorigin="anonymous">
     <source id="audio-src" src="musica.mp3" type="audio/mpeg">
     Tu navegador no soporta el elemento de audio.
   </audio>
 
 <script>
+  // Permitir cambiar el audio por URL: ?audio=mi_cancion.mp3
+  const params = new URLSearchParams(location.search);
+
   const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints>0 || navigator.msMaxTouchPoints>0;
   const canvas = document.getElementById('canvas');
   const ctx = canvas.getContext('2d');
   const cursor = document.getElementById('cursor');
   const audio = document.getElementById('audio-control');
+  const sourceEl = audio.querySelector('source');
+  const audioParam = params.get('audio');
+  const resolvedURL = audioParam ? new URL(audioParam, location.href).href : new URL('./musica.mp3', location.href).href;
+  sourceEl.src = resolvedURL;
+  console.log('Audio URL resuelta:', resolvedURL);
+  audio.load();
+  
+  audio.muted = false; // por si Safari/iOS lo inicia muteado
   const messageRain = 'ME ENCANTAS'; // solo lluvia y partículas
 
   let audioStarted = false;
   function playAudio(){
     if (!audioStarted) {
       audio.volume = 0.85;
-      audio.play().catch(()=>{});
+      const p = audio.play();
+      if (p && typeof p.then === 'function') {
+        p.then(()=>{ audioStarted = true; })
+         .catch(err=>{ console.warn('Audio bloqueado por el navegador:', err); });
+      } else {
+        audioStarted = true;
+      }
+    }
+  })
+         .catch(err=>{ console.warn('Audio bloqueado por el navegador:', err); showPlayHint(); });
+      } else {
+        audioStarted = true; hidePlayHint();
+      }
+    }
+  }
+
+  // DEBUG: avisar si el recurso de audio no carga
+  audio.addEventListener('error', ()=>{
+    const code = (audio.error && audio.error.code) || 'desconocido';
+    console.warn('Error al cargar/reproducir el audio. MediaError code:', code);
+  });
+    showPlayHint();
+  });
+
+  // Prueba HEAD para ver si el archivo existe
+  try {
+    const audioURL = sourceEl.src;
+    fetch(audioURL, { method:'HEAD' }).then(r=>{
+      if(!r.ok){ console.warn('No se pudo encontrar el audio (status)', r.status, audioURL); showPlayHint(); }
+    }).catch(()=>{});
+  } catch(_) {})
+         .catch(err=>{ console.warn('Audio bloqueado por el navegador:', err); showPlayHint(); });
+      } else {
+        audioStarted = true; hidePlayHint();
+      }
+    }
+  });
       audioStarted = true;
     }
   }
-  document.body.addEventListener(isTouch ? 'touchstart' : 'click', playAudio);
+  document.body.addEventListener(isTouch ? 'touchstart' : 'click', playAudio, { passive:false });
+  // listeners redundantes para móviles
+  window.addEventListener('touchend', playAudio, { passive:false });
+  document.addEventListener('click', playAudio, { passive:true });
+  canvas.addEventListener(isTouch ? 'touchstart' : 'click', playAudio, { capture:true, passive:false });
+  document.addEventListener('visibilitychange', ()=>{ if(!document.hidden && audioStarted && audio.paused) audio.play().catch(()=>{}); }); });
 
   canvas.width = innerWidth; canvas.height = innerHeight;
 
