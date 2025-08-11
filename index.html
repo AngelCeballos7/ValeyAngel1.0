@@ -5,135 +5,51 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>Lluvia Gigante de Amor</title>
   <style>
-    body {
-      margin: 0;
-      background: black;
-      overflow: hidden;
-      cursor: none;
-      touch-action: manipulation;
-      font-family: 'Courier New', monospace;
-    }
-    canvas {
-      display: block;
-      position: absolute;
-      top: 0;
-      left: 0;
-    }
-    .overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 2;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      pointer-events: none;
-    }
-    .center-message {
-      color: #ff69b4;
-      font-size: clamp(2.2rem, 8vw, 6rem);
-      text-align: center;
-      opacity: 0.88;
-      text-shadow: 0 0 12px rgba(255, 105, 180, 0.7);
-      letter-spacing: 1px;
-      user-select:none;
-    }
-    .heart-cursor {
-      position: absolute;
-      width: 32px; height: 32px;
-      z-index: 9999;
-      pointer-events: none;
-      transition: transform 0.1s ease;
-      filter: drop-shadow(0 0 4px #ff69b4);
-    }
-    #audio-control { position: absolute; opacity: 0; z-index: -1; }
+    body { margin:0; background:#000; overflow:hidden; cursor:none; touch-action:manipulation; font-family:'Courier New', monospace; }
+    canvas { position:absolute; inset:0; display:block; }
+    .overlay { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none; z-index:2; }
+    .center-message { color:#ff69b4; font-size:clamp(2.2rem, 8vw, 6rem); text-align:center; opacity:.9; text-shadow:0 0 12px rgba(255,105,180,.7); letter-spacing:1px; user-select:none; }
+    .heart-cursor { position:absolute; width:32px; height:32px; z-index:9999; pointer-events:none; transition:transform .1s ease; filter:drop-shadow(0 0 4px #ff69b4); }
+    #audio-control { position:absolute; opacity:0; z-index:-1; }
   </style>
 </head>
 <body>
   <canvas id="canvas"></canvas>
-
-  <div class="overlay"><div id="center" class="center-message">ME ENCANTAS💖</div></div>
-
-  <img id="cursor" class="heart-cursor" alt="heart" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjZmY2OWI0IiBkPSJNNDcuNiAyNUMyNS4xIDI1IDcgNDMuMSA3IDY1LjZDNyA4OC4xIDI0LjMgMTI3IDkzLjUgMTU3LjVjNjkuMiAzMC41IDE0Ni4zIDY0LjEgMTYxLjUgODQuMSAxNS4yLTIwIDEwMC4xLTUzLjYgMTY5LjMtODQuMSA2OS4yLTMwLjUgODYuNS02OS40IDg2LjUtOTEuOSAwLTIyLjUtMTguMS00MC42LTQwLjYtNDAuNnMtNDAuNiAxOC4xLTQwLjYgNDAuNmMwIDguMSAxLjYgMTUuNSA0LjMgMjIuMi0zLjEgMi4yLTYuNyAzLjUtMTAuNyAzLjUtMTMuOCAwLTI1LTExLjItMjUtMjVzMTEuMi0yNSAyNS0yNWM4LjEgMCAxNS41IDMuOSAyMC4yIDEwLjIgMTEuNy0xNS4yIDE4LjgtMzQuMiAxOC44LTU1LjIgMC00NS45LTM3LjItODMuMS04My4xLTgzLjFzLTgzLjEgMzcuMi04My4xIDgzLjFjMCAxNi4zIDQuNyAzMS41IDEyLjggNDQuMy0xLjIgMS4xLTIuNiAyLjEtNC4xIDIuOS0xNC4zIDcuOC0yNiggMTQuOS0zNi4yIDIwLjJDMTA5LjMgMTIxLjUgNDcuNiA4OC4xIDQ3LjYgNjUuNnMxOC4xLTQwLjYgNDAuNi00MC42QzEwOS4zIDI1IDc3IDQzLjEgNzcgNjUuNnMzMi4zIDQwLjYgMzIuMyA0MC42UzE3MC4xIDI1IDQ3LjYgMjV6Ii8+PC9zdmc+" />
-
-  <audio id="audio-control" loop preload="auto" playsinline x-webkit-airplay="allow" crossorigin="anonymous">
-    <source id="audio-src" src="musica.mp3" type="audio/mpeg">
-    Tu navegador no soporta el elemento de audio.
+  <div class="overlay"><div class="center-message">ME ENCANTAS💖</div></div>
+  <img id="cursor" class="heart-cursor" alt="heart" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjZmY2OWI0IiBkPSJNNDcuNiAyNUMyNS4xIDI1IDcgNDMuMSA3IDY1LjZDNyA4OC4xIDI0LjMgMTI3IDkzLjUgMTU3LjVjNjkuMiAzMC41IDE0Ni4zIDY0LjEgMTYxLjUgODQuMSAxNS4yLTIwIDEwMC4xLTUzLjYgMTY5LjMtODQuMSA2OS4yLTMwLjUgODYuNS02OS40IDg2LjUtOTEuOSAwLTIyLjUtMTguMS00MC42LTQwLjYtNDAuNnMtNDAuNiAxOC4xLTQwLjYgNDAuNmMwIDguMSAxLjYgMTUuNSA0LjMgMjIuMi0zLjEgMi4yLTYuNyAzLjUtMTAuNyAzLjUtMTMuOCAwLTI1LTExLjItMjUtMjVzMTEuMi0yNSAyNS0yNWM4LjEgMCAxNS41IDMuOSAyMC4yIDEwLjIgMTEuNy0xNS4yIDE4LjgtMzQuMiAxOC44LTU1LjIgMC00NS45LTM3LjItODMuMS04My4xLTgzLjFzLTgzLjEgMzcuMi04My4xIDgzLjFjMCAxNi4zIDQuNyAzMS41IDEyLjggNDQuMy0xLjIgMS4xLTIuNiAyLjEtNC4xIDIuOS0xNC4zIDcuOC0yNiggMTQuOS0zNi4yIDIwLjJDMTA5LjMgMTIxLjUgNDcuNiA4OC4xIDQ3LjYgNjUuNnMxOC4xLTQwLjYgNDAuNi00MC42QzEwOS4zIDI1IDc3IDQzLjEgNzcgNjUuNnMzMi4zIDQwLjYgMzIuMyA0MC42UzE3MC4xIDI1IDQ3LjYgMjV6Ii8+PC9zdmc+"/>
+  <audio id="audio-control" loop preload="auto" playsinline crossorigin="anonymous">
+    <source src="musica.mp3" type="audio/mpeg" />
   </audio>
 
 <script>
-  // Permitir cambiar el audio por URL: ?audio=mi_cancion.mp3
-  const params = new URLSearchParams(location.search);
-
+(function(){
   const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints>0 || navigator.msMaxTouchPoints>0;
   const canvas = document.getElementById('canvas');
   const ctx = canvas.getContext('2d');
   const cursor = document.getElementById('cursor');
   const audio = document.getElementById('audio-control');
-  const sourceEl = audio.querySelector('source');
-  const audioParam = params.get('audio');
-  const resolvedURL = audioParam ? new URL(audioParam, location.href).href : new URL('./musica.mp3', location.href).href;
-  sourceEl.src = resolvedURL;
-  console.log('Audio URL resuelta:', resolvedURL);
-  audio.load();
-  
-  audio.muted = false; // por si Safari/iOS lo inicia muteado
-  const messageRain = 'ME ENCANTAS'; // solo lluvia y partículas
+  const messageRain = 'ME ENCANTAS';
 
+  // --- Audio: iniciar solo una vez con el primer tap/click ---
   let audioStarted = false;
-  function playAudio(){
-    if (!audioStarted) {
-      audio.volume = 0.85;
-      const p = audio.play();
-      if (p && typeof p.then === 'function') {
-        p.then(()=>{ audioStarted = true; })
-         .catch(err=>{ console.warn('Audio bloqueado por el navegador:', err); });
-      } else {
-        audioStarted = true;
-      }
-    }
-  })
-         .catch(err=>{ console.warn('Audio bloqueado por el navegador:', err); showPlayHint(); });
-      } else {
-        audioStarted = true; hidePlayHint();
-      }
-    }
-  }
-
-  // DEBUG: avisar si el recurso de audio no carga
-  audio.addEventListener('error', ()=>{
-    const code = (audio.error && audio.error.code) || 'desconocido';
-    console.warn('Error al cargar/reproducir el audio. MediaError code:', code);
-  });
-    showPlayHint();
-  });
-
-  // Prueba HEAD para ver si el archivo existe
-  try {
-    const audioURL = sourceEl.src;
-    fetch(audioURL, { method:'HEAD' }).then(r=>{
-      if(!r.ok){ console.warn('No se pudo encontrar el audio (status)', r.status, audioURL); showPlayHint(); }
-    }).catch(()=>{});
-  } catch(_) {})
-         .catch(err=>{ console.warn('Audio bloqueado por el navegador:', err); showPlayHint(); });
-      } else {
-        audioStarted = true; hidePlayHint();
-      }
-    }
-  });
+  function tryStartAudio(){
+    if (audioStarted) return;
+    audio.volume = 0.85;
+    audio.muted = false;
+    const playPromise = audio.play();
+    if (playPromise && typeof playPromise.then === 'function') {
+      playPromise.then(()=>{ audioStarted = true; }).catch(()=>{});
+    } else {
       audioStarted = true;
     }
   }
-  document.body.addEventListener(isTouch ? 'touchstart' : 'click', playAudio, { passive:false });
-  // listeners redundantes para móviles
-  window.addEventListener('touchend', playAudio, { passive:false });
-  document.addEventListener('click', playAudio, { passive:true });
-  canvas.addEventListener(isTouch ? 'touchstart' : 'click', playAudio, { capture:true, passive:false });
-  document.addEventListener('visibilitychange', ()=>{ if(!document.hidden && audioStarted && audio.paused) audio.play().catch(()=>{}); }); });
+  const startEvents = ['click','touchstart','touchend'];
+  startEvents.forEach(ev=> document.addEventListener(ev, tryStartAudio, { passive:true }));
 
-  canvas.width = innerWidth; canvas.height = innerHeight;
+  // --- Canvas base ---
+  function resize(){ canvas.width = innerWidth; canvas.height = innerHeight; }
+  resize();
+  addEventListener('resize', resize);
 
   if(isTouch){ cursor.style.display='none'; }
   else{
@@ -143,13 +59,11 @@
       cursor.style.transform = `scale(${1 + Math.sin(Date.now()/300)*0.05})`;
     });
     addEventListener('mousedown', ()=> cursor.style.transform='scale(0.82)');
-    addEventListener('mouseup', ()=>{
-      cursor.style.transform='scale(1.08)';
-      setTimeout(()=>cursor.style.transform='scale(1)', 110);
-    });
+    addEventListener('mouseup', ()=>{ cursor.style.transform='scale(1.08)'; setTimeout(()=>cursor.style.transform='scale(1)', 110); });
   }
 
-  const baseFontSize = isTouch?24:42;
+  // --- Lluvia ---
+  let baseFontSize = isTouch?24:42;
   let columns = Math.floor(canvas.width / (baseFontSize * 2));
   let drops = new Array(columns).fill(1);
   ctx.font = `bold ${baseFontSize}px monospace`;
@@ -174,15 +88,16 @@
     }
   }
 
+  // --- Partículas (explosión) ---
   const particles = [];
   function spawnParticles(x,y){
     const dirs = [ {x:0,y:-1},{x:0,y:1},{x:-1,y:0},{x:1,y:0} ];
-    dirs.forEach(d=> particles.push({ x, y, vx:d.x*(3+Math.random()*2), vy:d.y*(3+Math.random()*2), a:1, size:baseFontSize + Math.random()*30, color: (Math.random()>0.5?'#ff69b4':'#ff007f') }));
+    dirs.forEach(d=> particles.push({ x, y, vx:d.x*(3+Math.random()*2), vy:d.y*(3+Math.random()*2), a:1, size:baseFontSize + Math.random()*30, color:(Math.random()>0.5?'#ff69b4':'#ff007f') }));
     for(let i=0;i<16;i++) particles.push({ x, y, vx:(Math.random()-0.5)*6, vy:(Math.random()-0.5)*6, a:1, size:baseFontSize + Math.random()*20, color:(Math.random()>0.5?'#ff69b4':'#ff007f') });
   }
   canvas.addEventListener(isTouch? 'touchstart':'click', (e)=>{
-    const x = isTouch? e.touches[0].clientX : e.clientX;
-    const y = isTouch? e.touches[0].clientY : e.clientY;
+    const x = isTouch? (e.touches[0]?.clientX || 0) : e.clientX;
+    const y = isTouch? (e.touches[0]?.clientY || 0) : e.clientY;
     spawnParticles(x,y);
   });
 
@@ -202,12 +117,7 @@
 
   function animate(){ drawMatrix(); drawParticles(); requestAnimationFrame(animate); }
   animate();
-
-  addEventListener('resize', ()=>{
-    canvas.width = innerWidth; canvas.height = innerHeight;
-    columns = Math.floor(canvas.width / (baseFontSize * 2));
-    drops = new Array(columns).fill(1);
-  });
+})();
 </script>
 </body>
 </html>
